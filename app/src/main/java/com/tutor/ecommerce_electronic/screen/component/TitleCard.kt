@@ -33,8 +33,8 @@ fun TitleCard(
 	) {
 		Text(
 			text = title,
-			style = MaterialTheme.typography.titleMedium,
-			fontWeight = FontWeight.Bold
+			style = MaterialTheme.typography.titleLarge,
+			fontWeight = FontWeight.SemiBold
 		)
 		if (clickEnabled) {
 			TextButton(

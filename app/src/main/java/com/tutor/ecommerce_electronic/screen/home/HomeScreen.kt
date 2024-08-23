@@ -3,7 +3,6 @@ package com.tutor.ecommerce_electronic.screen.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -14,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -26,15 +23,12 @@ import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrecisionManufacturing
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.ShoppingBag
@@ -44,7 +38,6 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,19 +45,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedIconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -72,8 +61,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tutor.ecommerce_electronic.R
-import com.tutor.ecommerce_electronic.screen.component.ProductData
-import com.tutor.ecommerce_electronic.screen.component.exampleProductData
+import com.tutor.ecommerce_electronic.screen.component.ProductList
+import com.tutor.ecommerce_electronic.screen.component.SearchField
 
 @OptIn(
 	ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
@@ -85,7 +74,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 		topBar = {
 			TopAppBar(title = {
 				Text(text = "Ecommerce Electronic")
-
 			},
 				actions = {
 					OutlinedIconButton(
@@ -133,17 +121,17 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 				.padding(horizontal = 15.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			Search(search)
+			SearchField(search)
 			Location()
 			Category()
 			Carousel(statePager)
-			ProductList()
+			FlashSale()
 		}
 	}
 }
 
 @Composable
-private fun ProductList(modifier: Modifier = Modifier) {
+private fun FlashSale(modifier: Modifier = Modifier) {
 	Card(
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.background
@@ -186,92 +174,7 @@ private fun ProductList(modifier: Modifier = Modifier) {
 					)
 				}
 			}
-
-			LazyVerticalStaggeredGrid(
-				columns = StaggeredGridCells.Fixed(2),
-				verticalItemSpacing = 10.dp,
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-			) {
-				items(10) {
-					ProductItem(exampleProductData)
-				}
-			}
-		}
-	}
-}
-
-@Composable
-fun ProductItem(product: ProductData) {
-	ElevatedCard(
-		elevation = CardDefaults.elevatedCardElevation(
-			defaultElevation = 2.dp
-		),
-	) {
-		Column(
-			modifier = Modifier.padding(10.dp),
-//			verticalArrangement = Arrangement.spacedBy(4.dp)
-		) {
-			Box() {
-				Box() {
-					Image(
-						painter = painterResource(R.drawable.ic_launcher_foreground),
-						contentDescription = "Product Image",
-						modifier = Modifier
-							.fillMaxWidth()
-							.height(180.dp)
-					)
-					Box() {
-						Badge() {
-							Text(text = "New")
-						}
-					}
-					Box(modifier = Modifier.align(Alignment.TopEnd)) {
-						Badge() {
-							Text(text = "16% off")
-						}
-					}
-				}
-			}
-			Text(
-				text = product.name,
-				style = MaterialTheme.typography.titleSmall,
-//				fontWeight = FontWeight.SemiBold
-			)
-			Text(
-				text = "R${product.price}",
-				style = MaterialTheme.typography.titleLarge,
-				fontWeight = FontWeight.Bold
-
-			)
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-			) {
-
-				Icon(
-					Icons.Default.Star,
-					contentDescription = "Star",
-					tint = Color.Yellow.copy(alpha = 0.8f),
-				)
-				Text(
-					text = "${product.rating}",
-					style = MaterialTheme.typography.bodySmall,
-				)
-				Text(text = " . ${product.sold} sold")
-			}
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					imageVector = Icons.Default.LocationOn,
-					contentDescription = "Location",
-					tint = MaterialTheme.colorScheme.primary
-				)
-				Text(
-					text = "Jakarta",
-					style = MaterialTheme.typography.bodySmall,
-
-					)
-			}
+			ProductList()
 		}
 	}
 }
@@ -318,25 +221,6 @@ private fun Carousel(statePager: PagerState) {
 			}
 		}
 	}
-}
-
-@Composable
-private fun Search(
-	search: MutableState<String>,
-	modifier: Modifier = Modifier
-) {
-	OutlinedTextField(
-		modifier = modifier.fillMaxWidth(),
-		colors = OutlinedTextFieldDefaults.colors(),
-		maxLines = 1,
-		placeholder = { Text("Find you needed...") },
-		value = search.value,
-		onValueChange = { search.value = it },
-		leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-		trailingIcon = {
-			Icon(Icons.Default.FilterList, contentDescription = "Filter")
-		}
-	)
 }
 
 @Composable
@@ -437,7 +321,7 @@ private fun RowScope.MyNavigationBarItem(
 @Preview
 @Composable
 private fun ProductListPrev() {
-	ProductList()
+	FlashSale()
 }
 
 @Preview
