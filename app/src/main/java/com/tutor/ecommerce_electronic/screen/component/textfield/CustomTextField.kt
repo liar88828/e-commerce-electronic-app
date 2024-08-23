@@ -1,4 +1,4 @@
-package com.tutor.ecommerce_electronic.screen.component
+package com.tutor.ecommerce_electronic.screen.component.textfield
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource

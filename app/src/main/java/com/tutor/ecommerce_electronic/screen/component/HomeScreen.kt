@@ -28,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tutor.ecommerce_electronic.R
+import com.tutor.ecommerce_electronic.model.ProductData
+import com.tutor.ecommerce_electronic.model.exampleProductData
 
 @Composable
 fun ProductList() {

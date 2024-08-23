@@ -29,9 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tutor.ecommerce_electronic.screen.component.PopularSearchData
 import com.tutor.ecommerce_electronic.screen.component.ProductList
-import com.tutor.ecommerce_electronic.screen.component.SearchField
 import com.tutor.ecommerce_electronic.screen.component.TitleCard
 import com.tutor.ecommerce_electronic.screen.component.examplePopularDataList
+import com.tutor.ecommerce_electronic.screen.component.textfield.SearchField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

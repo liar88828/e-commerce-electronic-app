@@ -1,4 +1,4 @@
-package com.tutor.ecommerce_electronic.screen.component
+package com.tutor.ecommerce_electronic.model
 
 data class UserData(
 	val name: String,

@@ -1,4 +1,4 @@
-package com.tutor.ecommerce_electronic.screen.component
+package com.tutor.ecommerce_electronic.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
