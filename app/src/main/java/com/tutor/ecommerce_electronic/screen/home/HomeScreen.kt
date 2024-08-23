@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,6 +72,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tutor.ecommerce_electronic.R
+import com.tutor.ecommerce_electronic.screen.component.ProductData
+import com.tutor.ecommerce_electronic.screen.component.exampleProductData
 
 @OptIn(
 	ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
@@ -147,9 +150,8 @@ private fun ProductList(modifier: Modifier = Modifier) {
 		)
 	) {
 		Column(
-			modifier = modifier.padding(10.dp),
+//			modifier = modifier.padding( 10.dp),
 		) {
-
 			Row(
 				modifier = modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.SpaceBetween,
@@ -175,9 +177,13 @@ private fun ProductList(modifier: Modifier = Modifier) {
 					{},
 					modifier
 						.padding(0.dp)
-						.height(35.dp)
+						.height(20.dp),
+					contentPadding = PaddingValues(0.dp)
 				) {
-					Text(text = "See all")
+					Text(
+						text = "See all",
+						modifier.padding(0.dp)
+					)
 				}
 			}
 
@@ -187,9 +193,7 @@ private fun ProductList(modifier: Modifier = Modifier) {
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 			) {
 				items(10) {
-					ProductItem(
-						Product()
-					)
+					ProductItem(exampleProductData)
 				}
 			}
 		}
@@ -197,7 +201,7 @@ private fun ProductList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ProductItem(product: Product) {
+fun ProductItem(product: ProductData) {
 	ElevatedCard(
 		elevation = CardDefaults.elevatedCardElevation(
 			defaultElevation = 2.dp
@@ -271,15 +275,6 @@ fun ProductItem(product: Product) {
 		}
 	}
 }
-
-data class Product(
-	val id: Int = 0,
-	val name: String = "Default Product",
-	val price: Double = 0.0,
-	val description: String = "No description available",
-	val rating: Double = 0.0,
-	val sold: Int = 0,
-)
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
