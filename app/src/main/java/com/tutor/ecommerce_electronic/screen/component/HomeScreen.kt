@@ -27,26 +27,36 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.R
 import com.tutor.ecommerce_electronic.model.ProductData
 import com.tutor.ecommerce_electronic.model.exampleProductData
+import com.tutor.ecommerce_electronic.screen.navigation.Routes
 
 @Composable
-fun ProductList() {
+fun ProductList(
+	navController: NavHostController
+) {
 	LazyVerticalStaggeredGrid(
+//		state = stateScroll,
 		columns = StaggeredGridCells.Fixed(2),
 		verticalItemSpacing = 10.dp,
 		horizontalArrangement = Arrangement.spacedBy(10.dp),
 	) {
 		items(10) {
-			ProductItem(exampleProductData)
+			ProductItem(exampleProductData, { navController.navigate(Routes.Detail) })
 		}
 	}
 }
 
 @Composable
-private fun ProductItem(product: ProductData) {
+private fun ProductItem(
+	product: ProductData,
+	to: () -> Unit
+) {
 	ElevatedCard(
+		onClick = to,
 		elevation = CardDefaults.elevatedCardElevation(
 			defaultElevation = 2.dp
 		),
@@ -125,5 +135,10 @@ private fun ProductItem(product: ProductData) {
 @Preview
 @Composable
 private fun ProductListPrev() {
-	ProductList()
+	val navController = rememberNavController()
+	ProductList(
+
+		navController = navController,
+//		stateScroll = rememberLazyStaggeredGridState()
+	)
 }

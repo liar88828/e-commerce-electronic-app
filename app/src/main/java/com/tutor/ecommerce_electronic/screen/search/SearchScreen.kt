@@ -1,5 +1,6 @@
 package com.tutor.ecommerce_electronic.screen.search
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -20,13 +23,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.screen.component.PopularSearchData
 import com.tutor.ecommerce_electronic.screen.component.ProductList
 import com.tutor.ecommerce_electronic.screen.component.TitleCard
@@ -35,38 +45,55 @@ import com.tutor.ecommerce_electronic.screen.component.textfield.SearchField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navController: NavHostController) {
 	val search = remember {
 		mutableStateOf("")
 
 	}
-	Scaffold(topBar = {
-		TopAppBar(
-			title = { SearchField(search = search) },
-			navigationIcon = {
-				IconButton({}) {
-					Icon(
-						imageVector = Icons.Default.ArrowBackIosNew,
-						contentDescription = "ArrowBack"
-					)
-				}
+	val scrollBehavior =
+		TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-			})
-	}) { innerPadding ->
+	Scaffold(
+		modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+		topBar = {
+
+			TopAppBar(
+				scrollBehavior = scrollBehavior,
+				title = { SearchField(search = search) },
+				navigationIcon = {
+					IconButton({
+						navController.navigateUp()
+					}) {
+						Icon(
+							imageVector = Icons.Default.ArrowBackIosNew,
+							contentDescription = "ArrowBack"
+						)
+					}
+
+				})
+		}) { innerPadding ->
+
+		val visible by remember {
+			derivedStateOf { scrollBehavior.state.overlappedFraction != 1f }
+		}
+
 		Column(
 			modifier = Modifier
 				.padding(innerPadding)
 				.padding(horizontal = 10.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			PopularSearch()
-			Recommended()
+			Text("${scrollBehavior.state.overlappedFraction}")
+			AnimatedVisibility(visible = visible) {
+				PopularSearch()
+			}
+			Recommended(navController)
 		}
 	}
 }
 
 @Composable
-private fun Recommended() {
+private fun Recommended(navController: NavHostController) {
 	Card {
 		Column(
 			Modifier.padding(10.dp),
@@ -76,7 +103,10 @@ private fun Recommended() {
 				title = "Recommended for You",
 				clickEnabled = false
 			)
-			ProductList()
+			ProductList(
+				navController = navController,
+//				stateScroll = rememberLazyStaggeredGridState()
+			)
 		}
 	}
 }
@@ -94,7 +124,8 @@ private fun PopularSearch() {
 				clickEnabled = false
 			)
 			FlowRow(
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.SpaceBetween,
 				verticalArrangement = Arrangement.spacedBy(10.dp),
 				maxItemsInEachRow = 2,
 			) {
@@ -111,7 +142,14 @@ private fun PopularSearch() {
 private fun PopularSearchItem(item: PopularSearchData, click: () -> Unit) {
 	ElevatedCard(
 		onClick = click,
-		modifier = Modifier.size(170.dp, 80.dp),
+		modifier = Modifier
+			.fillMaxWidth(.49f)
+			.height(80.dp)
+//			.size(
+//				width = 170.dp,
+//				height = 80.dp
+//			)
+
 	) {
 		Row(
 			modifier = Modifier
@@ -137,5 +175,7 @@ private fun PopularSearchItem(item: PopularSearchData, click: () -> Unit) {
 @Preview
 @Composable
 private fun SearchScreenPrev() {
-	SearchScreen()
+	val navController = rememberNavController()
+
+	SearchScreen(navController)
 }

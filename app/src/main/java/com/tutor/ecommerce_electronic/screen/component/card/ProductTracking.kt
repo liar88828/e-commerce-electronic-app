@@ -62,7 +62,7 @@ fun ProductTracking(
 				) {
 
 					Text(
-						text = item.color,
+						text = item.color[0],
 						style = MaterialTheme.typography.bodySmall,
 						fontWeight = FontWeight.Light
 					)

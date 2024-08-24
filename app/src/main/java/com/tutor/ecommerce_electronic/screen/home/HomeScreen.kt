@@ -1,5 +1,6 @@
 package com.tutor.ecommerce_electronic.screen.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,160 +36,209 @@ import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.twotone.Computer
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.R
 import com.tutor.ecommerce_electronic.screen.component.ProductList
 import com.tutor.ecommerce_electronic.screen.component.textfield.SearchField
+import com.tutor.ecommerce_electronic.screen.navigation.Routes
 
 @OptIn(
-	ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
-	ExperimentalFoundationApi::class
+	ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class
 )
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+
+	modifier: Modifier = Modifier, navController: NavHostController
+) {
+	val scrollBehavior =
+		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+	val scrollBehaviorBottom = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 	Scaffold(
+		modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 		topBar = {
-			TopAppBar(title = {
+
+			TopAppBar(scrollBehavior = scrollBehavior, title = {
+
 				Text(text = "Ecommerce Electronic")
-			},
-				actions = {
-					OutlinedIconButton(
-						{},
-						shape = MaterialTheme.shapes.medium
+			}, actions = {
+				OutlinedIconButton(
+					{}, shape = MaterialTheme.shapes.medium
+				) {
+					BadgedBox(
+						badge = { Badge() },
 					) {
-						BadgedBox(
-							badge = { Badge() },
-						) {
-							Icon(Icons.Outlined.Notifications, contentDescription = "Notification")
-						}
+						Icon(Icons.Outlined.Notifications, contentDescription = "Notification")
 					}
-					OutlinedIconButton(
-						{},
-						shape = MaterialTheme.shapes.medium
+				}
+				OutlinedIconButton(
+					{}, shape = MaterialTheme.shapes.medium
+				) {
+					BadgedBox(
+						badge = { Badge() },
 					) {
-						BadgedBox(
-							badge = { Badge() },
-						) {
-							Icon(Icons.Outlined.ShoppingBag, contentDescription = "ShopBag")
-						}
+						Icon(Icons.Outlined.ShoppingBag, contentDescription = "ShopBag")
 					}
-				},
-				navigationIcon = {
-					IconButton({}) {
-						Icon(Icons.Default.Menu, contentDescription = "Menu")
-					}
-				})
+				}
+			}, navigationIcon = {
+				IconButton({}) {
+					Icon(Icons.Default.Menu, contentDescription = "Menu")
+				}
+			})
 		},
 		bottomBar = {
-			NavigationBar {
-				MyNavigationBarItem(true, {}, Icons.Default.Home, "Home")
-				MyNavigationBarItem(false, {}, Icons.Default.FavoriteBorder, "Wishlist")
-				MyNavigationBarItem(false, {}, Icons.Default.Description, "Transaction")
-				MyNavigationBarItem(false, {}, Icons.Default.Person, "Profile")
+			BottomAppBar(
+				scrollBehavior = scrollBehaviorBottom
+			) {
+
+				MyNavigationBarItem(true, {
+					navController.navigate(Routes.Home)
+				}, Icons.Default.Home, "Home")
+				MyNavigationBarItem(false, {
+					navController.navigate(Routes.Wishlist)
+				}, Icons.Default.FavoriteBorder, "Wishlist")
+				MyNavigationBarItem(false, {
+					navController.navigate(Routes.Transaction)
+				}, Icons.Default.Description, "Transaction")
+				MyNavigationBarItem(false, {
+					navController.navigate(Routes.Profile)
+				}, Icons.Default.Person, "Profile")
 			}
 		},
 
 		) { innerPadding ->
 		val search = remember { mutableStateOf("") }
 		val statePager = rememberPagerState(pageCount = { 10 })
+
 		Column(
 			modifier = modifier
 				.padding(innerPadding)
 				.padding(horizontal = 15.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
+			val shouldHideBottomBar by remember {
+				derivedStateOf {
+					scrollBehavior.state.heightOffset <= -100f
+
+				}
+			}
+//			Text("${scrollBehavior.state.heightOffset}")
 			SearchField(search)
-			Location()
-			Category()
-			Carousel(statePager)
-			FlashSale()
+
+			AnimatedVisibility(
+				visible = !shouldHideBottomBar,
+//				enter = slideInVertically(animationSpec = tween(durationMillis = 200)),
+//				exit = slideOutVertically(animationSpec = tween(durationMillis = 200)),
+			) {
+				Column(
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+
+				) {
+
+					Location()
+					Category()
+					Carousel(statePager)
+				}
+			}
+
+			FlashSale(
+				navController,
+			)
 		}
 	}
 }
 
 @Composable
-private fun FlashSale(modifier: Modifier = Modifier) {
-	Card(
-		colors = CardDefaults.cardColors(
-			containerColor = MaterialTheme.colorScheme.background
-		)
-	) {
-		Column(
+private fun FlashSale(
+	navController: NavHostController,
+	modifier: Modifier = Modifier
+) {
+
+	Column(
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 //			modifier = modifier.padding( 10.dp),
-		) {
-			Row(
-				modifier = modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceBetween,
+	) {
+		Row(
+			modifier = modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceBetween,
+
 			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					Text(
-						text = "Flash Sale",
-						style = MaterialTheme.typography.titleMedium,
-						fontWeight = FontWeight.Bold
-					)
-					Text(
-						text = "Ends In",
-						style = MaterialTheme.typography.titleSmall,
-					)
-					Badge() {
-						Text(text = "20:20:20")
-					}
-				}
-				TextButton(
-					{},
-					modifier
-						.padding(0.dp)
-						.height(20.dp),
-					contentPadding = PaddingValues(0.dp)
-				) {
-					Text(
-						text = "See all",
-						modifier.padding(0.dp)
-					)
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
+			) {
+				Text(
+					text = "Flash Sale",
+					style = MaterialTheme.typography.titleLarge,
+					fontWeight = FontWeight.Bold
+				)
+				Text(
+					text = "Ends In",
+					style = MaterialTheme.typography.titleMedium,
+				)
+				Badge() {
+					Text(text = "20:20:20")
 				}
 			}
-			ProductList()
+			TextButton(
+				{ navController.navigate(Routes.Search) },
+				modifier
+					.padding(0.dp)
+					.height(20.dp),
+				contentPadding = PaddingValues(0.dp)
+			) {
+				Text(
+					text = "See all", modifier.padding(0.dp)
+				)
+			}
 		}
+		ProductList(
+			navController = navController,
+		)
 	}
 }
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-private fun Carousel(statePager: PagerState) {
+private fun Carousel(
+	statePager: PagerState
+) {
 	HorizontalPager(state = statePager) { page ->
 		Card(
 			modifier = Modifier.fillMaxWidth(),
 		) {
 			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceBetween
+				modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
 			) {
 
 				Column(
@@ -230,7 +280,8 @@ private fun Location() {
 		horizontalArrangement = Arrangement.spacedBy(4.dp)
 	) {
 		Icon(
-			Icons.Default.LocationOn, contentDescription = "Location",
+			Icons.Default.LocationOn,
+			contentDescription = "Location",
 			tint = MaterialTheme.colorScheme.primary
 		)
 		Text(
@@ -278,14 +329,11 @@ private fun CategoryItem(title: String, icon: ImageVector) {
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		OutlinedIconButton(
-			{},
-			modifier = Modifier.size(50.dp)
+			{}, modifier = Modifier.size(50.dp)
 
 		) {
 			Icon(
-				imageVector = icon, contentDescription = title,
-				modifier = Modifier
-					.size(25.dp)
+				imageVector = icon, contentDescription = title, modifier = Modifier.size(25.dp)
 //					.padding(10.dp)
 
 			)
@@ -303,29 +351,23 @@ private fun CategoryItem(title: String, icon: ImageVector) {
 private fun RowScope.MyNavigationBarItem(
 	select: Boolean, onClick: () -> Unit, icon: ImageVector, title: String
 ) {
-	NavigationBarItem(
-		selected = select,
-		onClick = onClick,
-		icon = {
-			Icon(
-				imageVector = icon,
-				contentDescription = title
-			)
-		},
-		label = {
-			Text(text = title)
-		}
-	)
+	NavigationBarItem(selected = select, onClick = onClick, icon = {
+		Icon(
+			imageVector = icon, contentDescription = title
+		)
+	}, label = {
+		Text(text = title)
+	})
 }
 
-@Preview
-@Composable
-private fun ProductListPrev() {
-	FlashSale()
-}
+//@Preview
+//@Composable
+//private fun ProductListPrev() {
+//	FlashSale()
+//}
 
 @Preview
 @Composable
 private fun HomeScreenPrev() {
-	HomeScreen()
+	HomeScreen(navController = rememberNavController())
 }

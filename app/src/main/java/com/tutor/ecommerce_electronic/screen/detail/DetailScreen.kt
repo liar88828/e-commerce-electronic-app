@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -33,93 +33,97 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.R
+import com.tutor.ecommerce_electronic.model.ProductData
+import com.tutor.ecommerce_electronic.model.exampleProductData
+import com.tutor.ecommerce_electronic.screen.component.text.ExpandableText
+import com.tutor.ecommerce_electronic.screen.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun DetailScreen(modifier: Modifier = Modifier) {
-	Scaffold(
-		bottomBar = {
-			BottomAppBar(
-				modifier = Modifier.fillMaxWidth()
+fun DetailScreen(
+	product: ProductData, modifier: Modifier = Modifier, navController: NavHostController
+) {
+
+	val isLike = remember {
+
+		mutableStateOf(false)
+	}
+	Scaffold(bottomBar = {
+		BottomAppBar(
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(horizontal = 10.dp),
+				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {
-				Row(
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(horizontal = 10.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp)
+				OutlinedButton(
+					{ navController.navigate(Routes.Cart) },
+					modifier
+						.weight(.5f)
+						.height(50.dp),
+					shape = MaterialTheme.shapes.small
 
 				) {
+					Icon(
+						imageVector = Icons.Default.ShoppingBag, contentDescription = "ShoppingBag"
+					)
+					Spacer(Modifier.padding(4.dp))
+					Text("Add to Cart")
+				}
+				Button(
+					{ navController.navigate(Routes.CheckOut) },
 
-					OutlinedButton(
-						{},
-						modifier
-							.weight(.5f)
-							.height(50.dp),
-						shape = MaterialTheme.shapes.small
+					modifier
+						.weight(.5f)
+						.height(50.dp), shape = MaterialTheme.shapes.small
+				) {
 
-					) {
-						Icon(
-							imageVector = Icons.Default.ShoppingBag,
-							contentDescription = "ShoppingBag"
-						)
-						Spacer(Modifier.padding(4.dp))
-						Text("Add to Cart")
-					}
-					Button(
-						{},
-
-						modifier
-							.weight(.5f)
-							.height(50.dp),
-						shape = MaterialTheme.shapes.small
-					) {
-
-						Text("Checkout")
-					}
+					Text("Checkout")
 				}
 			}
-		},
-		topBar = {
-			CenterAlignedTopAppBar(actions = {
-				IconButton({}) {
-					Icon(
-						imageVector = Icons.Default.Share, contentDescription = "Icon Share"
-					)
-				}
-			}, navigationIcon = {
-				IconButton({}) {
-					Icon(
-						imageVector = Icons.Default.ArrowBackIosNew,
-						contentDescription = "Icon Back"
-					)
-				}
-			}, title = {
-				Text(text = "Detail Product")
-			})
-		}) { innerPadding ->
+		}
+	}, topBar = {
+		CenterAlignedTopAppBar(actions = {
+			IconButton({}) {
+				Icon(
+					imageVector = Icons.Default.Share, contentDescription = "Icon Share"
+				)
+			}
+		}, navigationIcon = {
+			IconButton({
+				navController.navigateUp()
+			}) {
+				Icon(
+					imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Icon Back"
+				)
+			}
+		}, title = {
+			Text(text = "Detail Product")
+		})
+	}) { innerPadding ->
 		LazyColumn(
 			modifier
 				.padding(innerPadding)
@@ -128,38 +132,46 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 			item() { CarouselDetailProduct() }
 			item() {
 				Column(
-					verticalArrangement = Arrangement.spacedBy(10.dp)
+					verticalArrangement = Arrangement.spacedBy(6.dp)
 
 				) {
-
-					Row(
-						Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.SpaceBetween,
-						verticalAlignment = Alignment.CenterVertically
+					Column(
+						verticalArrangement = Arrangement.spacedBy(2.dp)
 					) {
-						Text(
-							"Ipad Pro 8 Generation 11 Inch 2022",
-							style = MaterialTheme.typography.titleMedium,
-							maxLines = 2,
-//					fontWeight = FontWeight.Medium
-						)
-						FilledIconToggleButton(
-							onCheckedChange = {},
-							checked = true
-						) {
-							Icon(
-								imageVector = Icons.Default.FavoriteBorder,
-								contentDescription = "Icon Favorite"
-							)
-						}
-					}
-					Column() {
-
 						Row(
-							Modifier, horizontalArrangement = Arrangement.spacedBy(10.dp)
+							Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.SpaceBetween,
+//							verticalAlignment = Alignment.Bottom
+							verticalAlignment = Alignment.CenterVertically
 						) {
 							Text(
-								text = "$${1242.00}",
+								product.name,
+								style = MaterialTheme.typography.titleLarge,
+								maxLines = 2,
+//					fontWeight = FontWeight.Medium
+							)
+							FilledIconToggleButton(
+								onCheckedChange = { isLike.value = !isLike.value },
+//								modifier = Modifier.size(40.dp),
+								checked = isLike.value,
+//								colors = IconButtonDefaults.filledIconToggleButtonColors(
+//									containerColor = MaterialTheme.colorScheme.primary,
+//									contentColor = MaterialTheme.colorScheme.onPrimary
+//								)
+							) {
+								Icon(
+									imageVector = Icons.Default.FavoriteBorder,
+									contentDescription = "Icon Favorite",
+								)
+							}
+						}
+
+						Row(
+							Modifier,
+							horizontalArrangement = Arrangement.spacedBy(10.dp)
+						) {
+							Text(
+								text = "$${product.price}",
 								style = MaterialTheme.typography.titleLarge,
 								fontWeight = FontWeight.Bold,
 								maxLines = 1
@@ -167,14 +179,14 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 
 							Badge() {
 								Text(
-									text = "6% off",
+									text = "${product.discount}% off",
 									style = MaterialTheme.typography.titleSmall
 								)
 							}
 
 						}
 						Text(
-							text = "$${1242.00}",
+							text = "$${product.sold}",
 							style = MaterialTheme.typography.titleMedium,
 							fontWeight = FontWeight.Light,
 							maxLines = 1,
@@ -190,9 +202,9 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 							style = MaterialTheme.typography.titleMedium,
 							fontWeight = FontWeight.SemiBold
 						)
+
 						ExpandableText(
-							"proin sociosqu lacinia interesset mattis vocibus intellegebat atomorum conclusionemque taciti dolores legere vix scripta primis maluisset omnesque sadipscing porttitor faucibus definitiones augue conubia praesent accusata vituperatoribus delenit massa libero movet oporteat suas dicunt saperet in ferri maiorum odio option ancillae",
-							3
+							text = product.description,
 						)
 //						Text(
 //							"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et",
@@ -213,8 +225,13 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 							fontWeight = FontWeight.SemiBold
 						)
 						Row(modifier.fillMaxWidth()) {
-							ColorPicker(modifier.weight(.5f))
-							SpecPicker(modifier.weight(.5f))
+							ColorPicker(
+								product.color,
+								modifier.weight(.5f),
+							)
+							SpecPicker(
+								product.addSpec, modifier.weight(.5f)
+							)
 						}
 					}
 				}
@@ -224,7 +241,10 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SpecPicker(modifier: Modifier = Modifier) {
+private fun SpecPicker(
+	spec: List<String>, modifier: Modifier = Modifier
+) {
+	val selectSpec = remember { mutableStateOf(spec[0]) }
 	Column(modifier) {
 		Row {
 			Text(
@@ -233,44 +253,32 @@ private fun SpecPicker(modifier: Modifier = Modifier) {
 				fontWeight = FontWeight.Light
 			)
 			Text(
-				"Wi-fi",
+				selectSpec.value,
 				style = MaterialTheme.typography.bodyMedium,
 				fontWeight = FontWeight.Bold
 			)
 		}
-		Row(
+		LazyRow(
 			horizontalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-
-			InputChip(
-				onClick = {},
-				selected = true,
-				label = {
-					Text(
-						text = "Wi-fi"
-					)
-				}
-			)
-
-			InputChip(
-				onClick = {},
-				selected = false,
-				label = {
-					Text(
-						text = "Wi-fi + Celullar"
-					)
-				}, modifier = Modifier.clickable { })
+			items(spec) {
+				InputChip(onClick = {
+					selectSpec.value = it
+				}, selected = true, label = {
+					Text(text = it)
+				})
+			}
 		}
-
 	}
 }
 
 @Composable
-private fun ColorPicker(modifier: Modifier = Modifier) {
-	Column(
-		modifier
+private fun ColorPicker(
+	itemColor: List<String>, modifier: Modifier = Modifier
+) {
+	val selectSpec = remember { mutableStateOf(itemColor[0]) }
 
-	) {
+	Column(modifier) {
 		Row {
 			Text(
 				"Colors : ",
@@ -278,40 +286,44 @@ private fun ColorPicker(modifier: Modifier = Modifier) {
 				fontWeight = FontWeight.Light
 			)
 			Text(
-				"Space Gray",
+				selectSpec.value,
 				style = MaterialTheme.typography.bodyMedium,
 				fontWeight = FontWeight.Bold
 			)
 		}
-		Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-			FilledIconButton(
-				onClick = {},
-			) {
-				Box(
-					modifier
-//						.background(color = Color.LightGray)
-
-						.border(
-							color = Color.Red,
-							width = 2.dp,
-							shape = CircleShape
-						)
-
-				)
+		LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+			items(itemColor) {
+				FilledIconButton(
+					onClick = { selectSpec.value = it },
+//				modifier = modifier
+//					.size(35.dp)
+//					.border(
+//					color = MaterialTheme.colorScheme.primary,
+//					shape = CircleShape,
+//					width = 2.dp
+//				),
+					colors = IconButtonDefaults.filledIconButtonColors(
+						containerColor = Color.LightGray, contentColor = Color.Yellow
+					)
+				) {
+					Box(
+						modifier = Modifier
+							.size(30.dp)
+							.clip(CircleShape)
+							.background(color = Color.Red.copy(.5f))
+					) {}
+//					Icon(
+//						imageVector = Icons.Default.Check, contentDescription = "icon check"
+//					)
+				}
 			}
 
-			FilledIconButton(
-				onClick = {},
-			) {
-				Box(modifier.background(color = Color.Gray))
-			}
 		}
 
 	}
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun CarouselDetailProduct(modifier: Modifier = Modifier) {
 	val pagerState = rememberPagerState(pageCount = { 3 })
 	HorizontalPager(
@@ -338,8 +350,7 @@ private fun IndicatorPager(total: Int, current: Int) {
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(vertical = 10.dp),
-		contentAlignment = Alignment.Center
+			.padding(vertical = 10.dp), contentAlignment = Alignment.Center
 	) {
 
 		Row(
@@ -352,8 +363,7 @@ private fun IndicatorPager(total: Int, current: Int) {
 						.size(height = 5.dp, width = 20.dp)
 //					.align(Alignment.Center)
 						.border(
-							shape = CircleShape,
-							width = 4.dp,
+							shape = CircleShape, width = 4.dp,
 //						color = MaterialTheme.colorScheme.primary
 							color = if (current == it) MaterialTheme.colorScheme.primary
 							else Color.LightGray.copy(.5f)
@@ -373,68 +383,12 @@ private fun IndicatorPager(total: Int, current: Int) {
 	}
 }
 
-@Composable
-fun ExpandableText(desc: String, maxLines: Int = 3) {
-	var expanded by remember { mutableStateOf(false) }
-
-	val annotatedString = buildAnnotatedString {
-		if (expanded) {
-			append(desc)
-			pushStringAnnotation(tag = "collapse", annotation = "collapse")
-			withStyle(
-				style = SpanStyle(
-					color = Color.Blue,
-					textDecoration = TextDecoration.Underline
-				)
-			) {
-				append(" Less text")
-			}
-			pop()
-		} else {
-			val textToShow = desc.take(100) // Example length before expansion
-			append(textToShow)
-			pushStringAnnotation(tag = "expand", annotation = "expand")
-			withStyle(
-				style = SpanStyle(
-					color = Color.Blue,
-					textDecoration = TextDecoration.Underline
-				)
-			) {
-				append("... Read more")
-			}
-			pop()
-		}
-	}
-
-	Column {
-		ClickableText(
-			text = annotatedString,
-			maxLines = if (expanded) Int.MAX_VALUE else maxLines,
-			overflow = TextOverflow.Ellipsis,
-			onClick = { offset ->
-				annotatedString.getStringAnnotations(offset, offset)
-					.firstOrNull()
-					?.let { annotation ->
-						when (annotation.tag) {
-							"expand" -> expanded = true
-							"collapse" -> expanded = false
-						}
-					}
-			}
-		)
-	}
-}
-
-//@Preview()
-//@Composable
-//private fun IndicatorPagerPrev() {
-//	IndicatorPager(
-//		4, 1
-//	)
-//}
-
 @Preview
 @Composable
 private fun DetailScreenPrev() {
-	DetailScreen()
+	val navController = rememberNavController()
+	DetailScreen(
+		navController = navController, product = exampleProductData
+	)
 }
+

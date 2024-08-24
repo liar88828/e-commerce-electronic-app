@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,7 +16,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.model.DeliverData
 import com.tutor.ecommerce_electronic.model.PaymentData
 import com.tutor.ecommerce_electronic.model.UserData
@@ -47,7 +49,7 @@ import com.tutor.ecommerce_electronic.screen.component.card.ProductCart
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier) {
+fun CheckOutScreen(modifier: Modifier = Modifier, navController: NavHostController) {
 	Scaffold(
 		bottomBar = {
 			BottomAppBar {
@@ -95,6 +97,7 @@ fun SearchScreen(modifier: Modifier = Modifier) {
 
 					Button(
 						{},
+						modifier.height(40.dp),
 						shape = MaterialTheme.shapes.medium
 					) {
 						Text(
@@ -135,15 +138,13 @@ fun SearchScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun PaymentMethod(modifier: Modifier = Modifier) {
-	Card {
-		Column(modifier.padding(10.dp)) {
-			TitleCard(title = "Payment Method", clickEnabled = false)
-			LazyRow(
-				modifier = modifier.padding(top = 10.dp),
-				horizontalArrangement = Arrangement.spacedBy(10.dp)
-			) {
-				items(examplePaymentDataList) { PaymentItem(it) }
-			}
+	Column() {
+		TitleCard(title = "Payment Method", clickEnabled = false)
+		LazyRow(
+			modifier = modifier.padding(top = 10.dp),
+			horizontalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			items(examplePaymentDataList) { PaymentItem(it) }
 		}
 	}
 }
@@ -181,93 +182,88 @@ private fun PaymentItem(
 fun SelectShipping(
 	item: DeliverData, modifier: Modifier = Modifier,
 ) {
-	Card() {
-		Column(
-			modifier
-				.fillMaxWidth()
-				.padding(10.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+	Column(
+		modifier.fillMaxWidth(),
+		verticalArrangement = Arrangement.spacedBy(10.dp)
 
-		) {
-			TitleCard(textButton = "See all option", title = "Select Shipping", click = {})
-			ElevatedCard(onClick = {}) {
-				Row(
-					modifier
-						.fillMaxWidth()
-						.padding(20.dp),
-					horizontalArrangement = Arrangement.SpaceBetween,
-					verticalAlignment = Alignment.CenterVertically
+	) {
+		TitleCard(textButton = "See all option", title = "Select Shipping", click = {})
+		ElevatedCard(onClick = {}) {
+			Row(
+				modifier
+					.fillMaxWidth()
+					.padding(20.dp),
+				horizontalArrangement = Arrangement.SpaceBetween,
+				verticalAlignment = Alignment.CenterVertically
 
-				) {
-					Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-						Text(
-							item.name,
-							style = MaterialTheme.typography.titleMedium,
-							fontWeight = FontWeight.SemiBold
-						)
-						Text(
-							"Estimated arrived : ${item.time}",
-							style = MaterialTheme.typography.titleSmall,
-							fontWeight = FontWeight.Light
-						)
-					}
+			) {
+				Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 					Text(
-						"$${item.price}",
-						style = MaterialTheme.typography.titleLarge,
-						fontWeight = FontWeight.Bold
+						item.name,
+						style = MaterialTheme.typography.titleMedium,
+						fontWeight = FontWeight.SemiBold
+					)
+					Text(
+						"Estimated arrived : ${item.time}",
+						style = MaterialTheme.typography.titleSmall,
+						fontWeight = FontWeight.Light
 					)
 				}
-			}
-
-
-			Row(
-				modifier = modifier
-					.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceBetween
-			) {
 				Text(
-					text = "Note : ",
-					style = MaterialTheme.typography.titleMedium,
-					fontWeight = FontWeight.Bold
-				)
-				OutlinedTextField(
-					value = "",
-					onValueChange = {},
-					modifier = modifier.width(200.dp),
-					maxLines = 1,
-					placeholder = {
-						Text(
-							text = "Enter your note here", maxLines = 1
-
-						)
-					}
-				)
-			}
-
-			Row(
-				modifier = modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceBetween
-			) {
-				Text(
-					text = "Subtotal : 1 items",
-					style = MaterialTheme.typography.titleMedium,
-					fontWeight = FontWeight.Bold
-				)
-				Text(
-					text = "$${item.price}",
+					"$${item.price}",
 					style = MaterialTheme.typography.titleLarge,
 					fontWeight = FontWeight.Bold
 				)
 			}
-
 		}
-	}
 
+
+		Row(
+			modifier = modifier
+				.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceBetween
+		) {
+			Text(
+				text = "Note : ",
+				style = MaterialTheme.typography.titleMedium,
+				fontWeight = FontWeight.Bold
+			)
+			OutlinedTextField(
+				value = "",
+				onValueChange = {},
+				modifier = modifier.width(200.dp),
+				maxLines = 1,
+				placeholder = {
+					Text(
+						text = "Enter your note here", maxLines = 1
+
+					)
+				}
+			)
+		}
+
+		Row(
+			modifier = modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceBetween
+		) {
+			Text(
+				text = "Subtotal : 1 items",
+				style = MaterialTheme.typography.titleMedium,
+				fontWeight = FontWeight.Bold
+			)
+			Text(
+				text = "$${item.price}",
+				style = MaterialTheme.typography.titleLarge,
+				fontWeight = FontWeight.Bold
+			)
+		}
+
+	}
 }
 
 @Composable
 private fun ShippingAddress(item: UserData, modifier: Modifier = Modifier) {
-	Card() {
+	ElevatedCard() {
 		Row(
 			modifier = modifier
 				.fillMaxWidth()
@@ -334,6 +330,7 @@ private fun ShippingAddress(item: UserData, modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun SearchScreenPrev() {
-	SearchScreen()
+private fun CheckoutScreenPrev() {
+	val navController = rememberNavController()
+	CheckOutScreen(navController = navController)
 }

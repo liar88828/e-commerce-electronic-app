@@ -18,26 +18,17 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -45,11 +36,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.R
+import com.tutor.ecommerce_electronic.screen.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartScreen() {
+fun CartScreen(navController: NavHostController) {
 	Scaffold(
 		bottomBar = {
 			BottomAppBar {
@@ -72,7 +66,10 @@ fun CartScreen() {
 						)
 
 					}
-					Button({}) {
+					Button(
+						{ navController.navigate(Routes.CheckOut) },
+						modifier = Modifier.height(50.dp)
+					) {
 						Text(text = "Checkout")
 
 					}
@@ -80,8 +77,10 @@ fun CartScreen() {
 			}
 		},
 		topBar = {
-			TopAppBar(navigationIcon = {
-				IconButton({}) {
+			CenterAlignedTopAppBar(navigationIcon = {
+				IconButton({
+					navController.navigateUp()
+				}) {
 					Icon(
 						imageVector = Icons.Default.ArrowBackIosNew,
 						contentDescription = "Icon Back"
@@ -131,7 +130,7 @@ private fun ProductItemHorizontal() {
 					Checkbox(checked = false, onCheckedChange = { })
 				}
 			}
-			Column(modifier = Modifier.padding(start=10.dp)) {
+			Column(modifier = Modifier.padding(start = 10.dp)) {
 				Text(
 					text = "Product Name",
 					style = MaterialTheme.typography.titleSmall,
@@ -156,15 +155,19 @@ private fun ProductItemHorizontal() {
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						FilledIconButton({}) {
-							Icon(imageVector = Icons.Default.Remove,
-								contentDescription = "Icon Add")
+							Icon(
+								imageVector = Icons.Default.Remove,
+								contentDescription = "Icon Add"
+							)
 						}
 						Text(
 							text = "1", style = MaterialTheme.typography.titleLarge
 						)
 						FilledIconButton({}) {
-							Icon(imageVector = Icons.Default.Add,
-								contentDescription = "Icon Add")
+							Icon(
+								imageVector = Icons.Default.Add,
+								contentDescription = "Icon Add"
+							)
 
 						}
 					}
@@ -216,5 +219,6 @@ private fun ProductItemHorizontal() {
 @Preview
 @Composable
 private fun CartScreenPrev() {
-	CartScreen()
+	val navController = rememberNavController()
+	CartScreen(navController)
 }

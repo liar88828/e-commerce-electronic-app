@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.model.TrackingItemData
 import com.tutor.ecommerce_electronic.model.exampleProductData
 import com.tutor.ecommerce_electronic.model.trackingItemList
@@ -46,7 +48,7 @@ import com.tutor.ecommerce_electronic.screen.component.card.ProductTracking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrackingScreen(modifier: Modifier = Modifier) {
+fun TrackingScreen(modifier: Modifier = Modifier, navController: NavHostController) {
 	Scaffold(
 		bottomBar = {
 			BottomAppBar {
@@ -66,7 +68,9 @@ fun TrackingScreen(modifier: Modifier = Modifier) {
 		},
 		topBar = {
 			CenterAlignedTopAppBar(navigationIcon = {
-				IconButton({}) {
+				IconButton({
+					navController.navigateUp()
+				}) {
 					Icon(
 						imageVector = Icons.Default.ArrowBackIosNew,
 						contentDescription = "Icon Back"
@@ -156,11 +160,11 @@ private fun TrackingItem(
 	}
 }
 
-@Preview
-@Composable
-private fun StepperPrev() {
-	Stepper()
-}
+//@Preview
+//@Composable
+//private fun StepperPrev() {
+//	Stepper()
+//}
 
 @Composable
 private fun Stepper(
@@ -243,5 +247,7 @@ private fun AddressItem(
 @Preview
 @Composable
 private fun TrackingScreenPrev() {
-	TrackingScreen()
+	val navController = rememberNavController()
+
+	TrackingScreen(navController = navController)
 }
