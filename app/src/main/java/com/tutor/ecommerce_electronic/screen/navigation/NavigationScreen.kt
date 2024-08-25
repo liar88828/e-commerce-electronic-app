@@ -7,6 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.tutor.ecommerce_electronic.model.exampleProductData
+import com.tutor.ecommerce_electronic.screen.auth.ForgetPasswordScreen
+import com.tutor.ecommerce_electronic.screen.auth.LoginScreen
+import com.tutor.ecommerce_electronic.screen.auth.NewForgetPasswordScreen
+import com.tutor.ecommerce_electronic.screen.auth.OtpScreen
+import com.tutor.ecommerce_electronic.screen.auth.RegisterScreen
 import com.tutor.ecommerce_electronic.screen.cart.CartScreen
 import com.tutor.ecommerce_electronic.screen.checkout.CheckOutScreen
 import com.tutor.ecommerce_electronic.screen.detail.DetailScreen
@@ -19,41 +24,41 @@ import kotlinx.serialization.Serializable
 fun NavigationScreen() {
 	val navController = rememberNavController()
 	NavHost(
-		navController = navController,
-		startDestination = Routes.Home
+		navController = navController, startDestination = Routes.Home
 	) {
 		composable<Routes.Home> { HomeScreen(navController = navController) }
 		composable<Routes.Search> { SearchScreen(navController = navController) }
 		composable<Routes.Detail> {
 			DetailScreen(
-				navController = navController,
-				product = exampleProductData
+				navController = navController, product = exampleProductData
 			)
 		}
 		composable<Routes.Cart> { CartScreen(navController = navController) }
 		composable<Routes.CheckOut> { CheckOutScreen(navController = navController) }
 		composable<Routes.Tracking> { TrackingScreen(navController = navController) }
+		composable<Routes.Login> { LoginScreen(navController = navController) }
+		composable<Routes.Register> { RegisterScreen(navController = navController) }
+		composable<Routes.ForgetPassword> { ForgetPasswordScreen(navController = navController) }
+		composable<Routes.Otp> { OtpScreen(navController = navController) }
+		composable<Routes.NewForgetPassword> { NewForgetPasswordScreen(navController = navController) }
+
+
 		composable<Routes.Wishlist> {
-			Button(
-				onClick = {
-					navController.navigateUp()
-				}
-			) { Text("White List") }
+			Button(onClick = {
+				navController.navigateUp()
+			}) { Text("White List") }
 		}
 		composable<Routes.Transaction> {
-			Button(
-				onClick = {
-					navController.navigateUp()
-				}
-			) { Text("Transaction") }
+			Button(onClick = {
+				navController.navigateUp()
+			}) { Text("Transaction") }
 		}
 		composable<Routes.Profile> {
-			Button(
-				onClick = {
-					navController.navigateUp()
-				}
-			) { Text("Profile") }
+			Button(onClick = {
+				navController.navigateUp()
+			}) { Text("Profile") }
 		}
+
 	}
 }
 
@@ -85,5 +90,20 @@ sealed class Routes {
 
 	@Serializable
 	data object Profile : Routes()
+
+	@Serializable
+	data object Register : Routes()
+
+	@Serializable
+	data object Login : Routes()
+
+	@Serializable
+	data object Otp : Routes()
+
+	@Serializable
+	data object ForgetPassword : Routes()
+
+	@Serializable
+	data object NewForgetPassword : Routes()
 
 }

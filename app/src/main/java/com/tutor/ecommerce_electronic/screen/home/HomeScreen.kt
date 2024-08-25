@@ -111,7 +111,9 @@ fun HomeScreen(
 					}
 				}
 			}, navigationIcon = {
-				IconButton({}) {
+				IconButton({
+					navController.navigate(Routes.Login)
+				}) {
 					Icon(Icons.Default.Menu, contentDescription = "Menu")
 				}
 			})
@@ -143,8 +145,7 @@ fun HomeScreen(
 		Column(
 			modifier = modifier
 				.padding(innerPadding)
-				.padding(horizontal = 15.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+				.padding(horizontal = 15.dp), verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
 			val shouldHideBottomBar by remember {
 				derivedStateOf {
@@ -180,8 +181,7 @@ fun HomeScreen(
 
 @Composable
 private fun FlashSale(
-	navController: NavHostController,
-	modifier: Modifier = Modifier
+	navController: NavHostController, modifier: Modifier = Modifier
 ) {
 
 	Column(
