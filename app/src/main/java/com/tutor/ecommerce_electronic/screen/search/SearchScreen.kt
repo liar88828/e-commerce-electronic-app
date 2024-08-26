@@ -83,7 +83,7 @@ fun SearchScreen(navController: NavHostController) {
 				.padding(horizontal = 10.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			Text("${scrollBehavior.state.overlappedFraction}")
+//			Text("${scrollBehavior.state.overlappedFraction}")
 			AnimatedVisibility(visible = visible) {
 				PopularSearch()
 			}

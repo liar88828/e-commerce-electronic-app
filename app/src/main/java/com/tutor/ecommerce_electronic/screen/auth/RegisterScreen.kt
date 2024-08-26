@@ -41,6 +41,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.tutor.ecommerce_electronic.screen.component.error.ErrorMsg
+import com.tutor.ecommerce_electronic.screen.component.textfield.MyTextField
 import com.tutor.ecommerce_electronic.screen.navigation.Routes
 
 data class FormRegister(
@@ -56,8 +58,9 @@ data class FormRegister(
 	var isErrorPhone: MutableState<Boolean> = mutableStateOf(false),
 	var address: MutableState<String> = mutableStateOf(""),
 	var isErrorAddress: MutableState<Boolean> = mutableStateOf(false),
-	var msgError: MutableState<String> = mutableStateOf(""),
 	var check: MutableState<Boolean> = mutableStateOf(false),
+	var msgError: MutableState<String> = mutableStateOf(""),
+	var isError: MutableState<Boolean> = mutableStateOf(false),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,33 +71,34 @@ fun RegisterScreen(
 	val form by remember { mutableStateOf(FormRegister()) }
 
 	fun onRegister() {
-		if (
-			form.name.value.isNotEmpty() &&
-			form.phone.value.isNotEmpty() &&
-			form.email.value.isNotEmpty() &&
-			form.address.value.isNotEmpty() &&
-			form.password.value.isNotEmpty() &&
-			form.confPass.value.isNotEmpty()
-		) {
-			if (form.check.value) {
-				if (form.password.value == form.confPass.value) {
-					navController.navigate(Routes.Login)
-				} else {
-					form.msgError.value = "Password Not Match"
-				}
-			} else {
-				form.msgError.value = "Please Accept Terms and Conditions"
+		try {
+			if (
+				form.name.value.isEmpty() &&
+				form.phone.value.isEmpty() &&
+				form.email.value.isEmpty() &&
+				form.address.value.isEmpty() &&
+				form.password.value.isEmpty() &&
+				form.confPass.value.isEmpty()
+			) {
+				throw Exception("Please Complete the Form")
 			}
-		} else {
+			if (!form.check.value) {
+				throw Exception("Please Accept Terms and Conditions")
+			}
+			if (form.password.value != form.confPass.value) {
+				throw Exception("Password Not Match")
+			}
 			form.isErrorEmail.value = form.email.value.isEmpty()
 			form.isErrorPassword.value = form.password.value.isEmpty()
 			form.isErrorName.value = form.name.value.isEmpty()
 			form.isErrorPhone.value = form.phone.value.isEmpty()
 			form.isErrorAddress.value = form.address.value.isEmpty()
 			form.isErrorConfPass.value = form.confPass.value.isEmpty()
-			form.msgError.value = "Please Complete the Form"
+			navController.navigate(Routes.Login)
+		} catch (e: Exception) {
+			form.msgError.value = e.message.toString()
+			form.isError.value = true
 		}
-
 	}
 
 	Scaffold(
@@ -177,12 +181,6 @@ fun RegisterScreen(
 					.width(250.dp)
 			)
 
-			Text(
-				text = form.msgError.value,
-//				color = MaterialTheme.colorScheme.error,
-//				style = MaterialTheme.typography.titleSmall
-			)
-
 			// name
 			MyTextField(isError = form.isErrorName.value,
 				value = form.name.value,
@@ -254,12 +252,10 @@ fun RegisterScreen(
 						Text(text = "Confirm Password is Required")
 					}
 				})
-			Text(
-				text = form.msgError.value,
-				color = MaterialTheme.colorScheme.error,
-				style = MaterialTheme.typography.titleSmall
+			ErrorMsg(
+				msgError = form.msgError,
+				isError = form.isError
 			)
-
 		}
 	}
 }

@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,15 +32,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.tutor.ecommerce_electronic.screen.component.error.ErrorMsg
 import com.tutor.ecommerce_electronic.screen.navigation.Routes
 
 data class FormResetPassword(
-	var password: String = "",
-	var confirmPassword: String = "",
-	var isError: Boolean = false,
-	var isErrorConfirmPassword: Boolean = false,
-	var isErrorPassword: Boolean = false,
-	var message: String = ""
+	var password: MutableState<String> = mutableStateOf(""),
+	var isErrorPassword: MutableState<Boolean> = mutableStateOf(false),
+	var confirmPassword: MutableState<String> = mutableStateOf(""),
+	var isErrorConfirmPassword: MutableState<Boolean> = mutableStateOf(false),
+	var msgError: MutableState<String> = mutableStateOf(""),
+	var isError: MutableState<Boolean> = mutableStateOf(false),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,42 +51,50 @@ fun NewForgetPasswordScreen(
 ) {
 	val form by remember { mutableStateOf(FormResetPassword()) }
 	fun newPassword() {
-		if (form.password.isNotEmpty() && form.confirmPassword.isNotEmpty()) {
-			if (form.password == form.confirmPassword) {
-				form.isError = false
-				navController.navigate(Routes.Login)
-			} else {
-				form.isError = true
-			}
+		try {
+			if (form.password.value.isEmpty() && form.confirmPassword.value.isEmpty()) {
 
+				throw Exception("Please Fill All Field")
+			}
+			if (form.password.value != form.confirmPassword.value) {
+				throw Exception("Password Not Match")
+			}
+			form.isErrorPassword.value = form.password.value.isEmpty()
+			form.isErrorConfirmPassword.value = form.confirmPassword.value.isEmpty()
+			navController.navigate(Routes.Login)
+		} catch (e: Exception) {
+			form.isError.value = false
+			form.msgError.value = e.message.toString()
 		}
 	}
 
-	Scaffold(bottomBar = {
-		NavigationBar() {
-			Button(
-				{ newPassword() },
+	Scaffold(
+		bottomBar = {
+			NavigationBar() {
+				Button(
+					{ newPassword() },
 //				shape = MaterialTheme.shapes.,
-				modifier = modifier
-					.fillMaxWidth()
-					.height(50.dp)
-					.padding(horizontal = 10.dp)
-			) {
-				Text(
-					text = "New Password",
-					style = MaterialTheme.typography.titleMedium,
-				)
+					modifier = modifier
+						.fillMaxWidth()
+						.height(50.dp)
+						.padding(horizontal = 10.dp)
+				) {
+					Text(
+						text = "New Password",
+						style = MaterialTheme.typography.titleMedium,
+					)
+				}
 			}
-		}
-	}, topBar = {
-		CenterAlignedTopAppBar(navigationIcon = {
-			IconButton(onClick = { navController.navigateUp() }) {
-				Icon(
-					imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back"
-				)
-			}
-		}, title = { Text("Reset Password") })
-	}) { innerPadding ->
+		},
+		topBar = {
+			CenterAlignedTopAppBar(navigationIcon = {
+				IconButton(onClick = { navController.navigateUp() }) {
+					Icon(
+						imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back"
+					)
+				}
+			}, title = { Text("Reset Password") })
+		}) { innerPadding ->
 		Column(
 			modifier = modifier
 				.padding(innerPadding)
@@ -111,41 +121,40 @@ fun NewForgetPasswordScreen(
 					}
 				},
 				shape = MaterialTheme.shapes.large,
-				value = form.password,
-				onValueChange = { form.password = it },
+				value = form.password.value,
+				onValueChange = { form.password.value = it },
 				label = { Text("Set New Password") },
-				isError = form.isError,
+				isError = form.isErrorPassword.value,
 				supportingText = {
-					if (form.isError) {
-						if (form.password.isEmpty()) {
-							Text(text = "Password Required")
-						} else {
-							Text(text = "Password Not Match")
-						}
+					if (form.isErrorPassword.value) {
+						Text(text = "Password Required")
 					}
 				})
 			OutlinedTextField(modifier = modifier
 				.fillMaxWidth()
 				.padding(0.dp),
-				value = form.confirmPassword,
 				shape = MaterialTheme.shapes.large,
-				onValueChange = { form.confirmPassword = it },
+				value = form.confirmPassword.value,
+				onValueChange = {
+					form.confirmPassword.value = it
+				},
 				label = { Text("Confirm Your New Password") },
 				trailingIcon = {
 					IconButton({}) {
 						Icon(imageVector = Icons.Default.RemoveRedEye, contentDescription = "Eye")
 					}
 				},
-				isError = form.isErrorConfirmPassword,
+				isError = form.isErrorConfirmPassword.value,
 				supportingText = {
-					if (form.isError) {
-						if (form.confirmPassword.isEmpty()) {
-							Text(text = "Confirm Password Required")
-						} else {
-							Text(text = "Password Not Match")
-						}
+					if (form.isErrorConfirmPassword.value) {
+						Text(text = "Confirm Password Required")
 					}
 				})
+			ErrorMsg(
+				msgError = form.msgError,
+				isError = form.isError
+			)
+
 		}
 	}
 }
